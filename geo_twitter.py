@@ -15,8 +15,8 @@ def stream_geo_tweets(file_name, query_term, n_total_tweet):
     from tweepy import OAuthHandler, StreamListener, streaming
     
     # Authorize connection to Twitter
-    auth = OAuthHandler('NhRbHxhDD12d7lsgwTwC6A', 'XdbhJTESBkhA2MBbDbANcXMpB7K4XBRehCgMANBQiQ')
-    auth.set_access_token('884709397-OXJWKwfmzknOUBcaEfPe8WJAxFm5nz1V6oAnj3U6', 'gC369XBOQXha706iLwf6HgIBaLg3B8zYaBprnfyp3kEmj')
+    auth = OAuthHandler('CONSUMER_KEY', 'CONSUMER_SECRET')
+    auth.set_access_token('ACCESS_TOKEN', 'ACCESS_TOKEN_SECRET')
     
     # Open the file to which tweets will be written
     with open(file_name, 'wb') as f:
@@ -165,11 +165,12 @@ def agg_by_state(df):
     # Return DataFrame
     return df
     
-def main(query_term):
+def main(argv):
 
     # Declarations
+    query_term = argv[1]
+    n_total_tweet = int(argv[2])
     file_name = 'geo_twitter.csv'
-    n_total_tweet = 20
     
     # Stream tweets with coordinates
     stream_geo_tweets(file_name, query_term, n_total_tweet)
@@ -185,4 +186,4 @@ def main(query_term):
     
 if __name__ == '__main__':
 
-    main(argv[1])
+    main(argv)
