@@ -2,7 +2,18 @@
 """
 Created on Mon May 19 09:23:32 2014
 
-@author: CONTJ073
+Usage: python geo_twitter.py --query term --number of tweets
+
+Description: Collects tweets from the Twitter Streaming API, filtering for
+those with geolocation metadata and a query term. The user specifies the query
+term and the number of tweets to collect. The data, along with information on
+whether the query term was mentioned as a user account, a hashtag, both, or
+neither, are aggregated by US state.
+
+Special dependencies: tweepy (https://github.com/tweepy/tweepy) and
+pygeocoder (https://bitbucket.org/xster/pygeocoder/wiki/Home)
+
+@author: Juan Manuel Contreras (juan.manuel.contreras.87@gmail.com)
 """
 
 # Import module
@@ -10,13 +21,15 @@ from sys import argv, stderr
 
 def stream_geo_tweets(file_name, query_term, n_total_tweet):
 
+    '''Collect tweets with a query term and geolocation metadata'''
+
     # Import modules
     from csv import writer
     from tweepy import OAuthHandler, StreamListener, streaming
     
     # Authorize connection to Twitter
-    auth = OAuthHandler('CONSUMER_KEY', 'CONSUMER_SECRET')
-    auth.set_access_token('ACCESS_TOKEN', 'ACCESS_TOKEN_SECRET')
+    auth = OAuthHandler('NhRbHxhDD12d7lsgwTwC6A', 'XdbhJTESBkhA2MBbDbANcXMpB7K4XBRehCgMANBQiQ')
+    auth.set_access_token('884709397-OXJWKwfmzknOUBcaEfPe8WJAxFm5nz1V6oAnj3U6', 'gC369XBOQXha706iLwf6HgIBaLg3B8zYaBprnfyp3kEmj')
     
     # Open the file to which tweets will be written
     with open(file_name, 'wb') as f:
@@ -59,9 +72,12 @@ def stream_geo_tweets(file_name, query_term, n_total_tweet):
     
     # Listen to the Twitter stream, filtering by query terms
     streaming_api = streaming.Stream(auth, CustomStreamListener(), timeout=60)
-    streaming_api.filter(track=query_term)
+    streaming_api.filter(track=[query_term])
 
 def analyze_tweets(file_name, query_term, n_total_tweet):
+    
+    '''Determine the US state to which each tweet belongs and whether the query
+       term mentioned refers to a user account, a hashtag, both, or neither'''
     
     # Import modules
     from csv import reader
@@ -91,6 +107,8 @@ def analyze_tweets(file_name, query_term, n_total_tweet):
 
 def reverse_geocode(latitude, longitude):
     
+    '''Perform reverse geocoding to identify each tweet's US state, if any'''    
+    
     # Import module
     from pygeocoder import Geocoder
 
@@ -111,7 +129,10 @@ def reverse_geocode(latitude, longitude):
             return address[i]['short_name'].encode('UTF-8')
 
 def user_or_hashtag(tweet, query_term):
-    
+   
+    '''Determine whether the query term mentioned refers to a user account, a
+       hashtag, both, or neither'''   
+   
     # Import module
     from re import search
     
@@ -124,6 +145,8 @@ def user_or_hashtag(tweet, query_term):
         return 'none'
 
 def agg_by_state(df):
+    
+    '''Aggregate data by US state, summing all relevant metrics'''
     
     # Import modules
     from csv import reader
@@ -168,9 +191,9 @@ def agg_by_state(df):
 def main(argv):
 
     # Declarations
+    file_name = 'geo_twitter.csv'
     query_term = argv[1]
     n_total_tweet = int(argv[2])
-    file_name = 'geo_twitter.csv'
     
     # Stream tweets with coordinates
     stream_geo_tweets(file_name, query_term, n_total_tweet)
