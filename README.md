@@ -1,6 +1,5 @@
 geo-twitter
 ===========
-**Repository of scripts that collect
 
 Collects tweets from the Twitter Streaming API, filtering for
 those with geolocation metadata and a query term. The user specifies the query
