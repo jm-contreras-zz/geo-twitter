@@ -16,16 +16,19 @@ pygeocoder (https://bitbucket.org/xster/pygeocoder/wiki/Home)
 @author: Juan Manuel Contreras (juan.manuel.contreras.87@gmail.com)
 """
 
-# Import module
+# Import modules
+from re import search
+from time import sleep
+from random import random
 from sys import argv, stderr
+from pandas import DataFrame
+from csv import writer, reader
+from pygeocoder import Geocoder
+from tweepy import OAuthHandler, StreamListener, streaming
 
 def stream_geo_tweets(file_name, query_term, n_total_tweet):
 
     '''Collect tweets with a query term and geolocation metadata'''
-
-    # Import modules
-    from csv import writer
-    from tweepy import OAuthHandler, StreamListener, streaming
     
     # Authorize connection to Twitter
     auth = OAuthHandler('CONSUMER_KEY', 'CONSUMER_SECRET')
@@ -79,12 +82,6 @@ def analyze_tweets(file_name, query_term, n_total_tweet):
     '''Determine the US state to which each tweet belongs and whether the query
        term mentioned refers to a user account, a hashtag, both, or neither'''
     
-    # Import modules
-    from csv import reader
-    from pandas import DataFrame
-    from time import sleep
-    from random import random
-    
     # Initialize an empty DataFrame
     df = DataFrame({'state': [None] * n_total_tweet,
                     'u_o_h': [None] * n_total_tweet})
@@ -108,9 +105,6 @@ def analyze_tweets(file_name, query_term, n_total_tweet):
 def reverse_geocode(latitude, longitude):
     
     '''Perform reverse geocoding to identify each tweet's US state, if any'''    
-    
-    # Import module
-    from pygeocoder import Geocoder
 
     # Perform reverse geocoding
     try:
@@ -132,9 +126,6 @@ def user_or_hashtag(tweet, query_term):
    
     '''Determine whether the query term mentioned refers to a user account, a
        hashtag, both, or neither'''   
-   
-    # Import module
-    from re import search
     
     # Determine whether the mention is user, hashtag, or none
     if search('@' + query_term, tweet.lower()):
@@ -147,10 +138,6 @@ def user_or_hashtag(tweet, query_term):
 def agg_by_state(df):
     
     '''Aggregate data by US state, summing all relevant metrics'''
-    
-    # Import modules
-    from csv import reader
-    from pandas import DataFrame
     
     # Define lambda functions for aggregation
     count_user = lambda x: sum(x == 'user')
